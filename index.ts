@@ -59,7 +59,7 @@ async function generateSideBySideImage(image: string | Buffer, gif: string | Buf
 			.toBuffer();
 
 		encoder.addFrame(compositeImage);
-		stdout.write(`\r\e[2K${i + 1}/${gifMetadata.pages}`);
+		stdout.write(`\r\x1b[2K${i + 1}/${gifMetadata.pages}`);
 	}
 
 	encoder.finish();
@@ -107,7 +107,8 @@ client.on('ready', () => {
 });
 
 client.on('messageCreate', async message => {
-	const { content } = message;
+	let { content } = message;
+	content = content.toLowerCase();
 
 	let operatorNameFound;
 	for (const operatorName of operatorNames) {
@@ -124,7 +125,7 @@ client.on('messageCreate', async message => {
 	const filename = `${operatorNameFound}.gif`;
 
 	if (fs.existsSync(filename)) {
-		message.reply({ files: [fs.readFileSync(filename)] });
+		message.reply({ files: [filename] });
 		return;
 	}
 
