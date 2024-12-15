@@ -59,7 +59,7 @@ async function generateSideBySideImage(image: string | Buffer, gif: string | Buf
 			.toBuffer();
 
 		encoder.addFrame(compositeImage);
-		stdout.write(`\r${i + 1}/${gifMetadata.pages}`);
+		stdout.write(`\r\e[2K${i + 1}/${gifMetadata.pages}`);
 	}
 
 	encoder.finish();
