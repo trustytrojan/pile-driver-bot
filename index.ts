@@ -6,6 +6,8 @@ import sharp from 'sharp';
 import GIFEncoder from 'gifencoder';
 import Discord from 'discord.js';
 
+let pileDriverChance = 0.5;
+
 const pileDriverGifs = [
 	'https://media1.tenor.com/m/Q7KV-nZ8W-AAAAAd/piledriver-sex.gif',
 	'https://media1.tenor.com/m/xpoRJWS15pEAAAAd/diesel-hammer-crane.gif'
@@ -62,6 +64,7 @@ async function generateSideBySideImage(image: string | Buffer, gif: string | Buf
 		stdout.write(`\r\x1b[2K${i + 1}/${gifMetadata.pages}`);
 	}
 
+	console.log();
 	encoder.finish();
 	return encoder.out.getData();
 }
@@ -95,30 +98,64 @@ if (!fs.existsSync('operators.json')) {
 const operatorNames = Object.keys(operators);
 
 const client = new Discord.Client({
-	intents: [
-		'Guilds',
-		'GuildMessages',
-		'MessageContent'
-	]
+	intents: ['Guilds', 'GuildMessages', 'MessageContent']
 });
 
-client.on('ready', () => {
+client.on('ready', client => {
 	console.log('ready');
+	client.guilds.fetch('1317908398066499614').then(g =>
+		g.commands.set([
+			{
+				name: 'set_chance',
+				description: 'set pile driver chance',
+				options: [
+					{
+						type: Discord.ApplicationCommandOptionType.Number,
+						name: 'chance',
+						description: 'chance',
+						required: true
+					}
+				]
+			}
+		])
+	);
+});
+
+client.on('interactionCreate', interaction => {
+	if (!interaction.inCachedGuild()) return;
+	if (!interaction.isChatInputCommand()) return;
+	switch (interaction.commandName) {
+		case 'set_chance':
+			{
+				const chance = interaction.options.getNumber('chance', true);
+				pileDriverChance = chance;
+				console.log(`set pile driver chance to ${chance}`);
+				interaction.reply(`set pile driver chance to ${chance}`);
+			}
+			break;
+	}
 });
 
 client.on('messageCreate', async message => {
-	let { content } = message;
-	content = content.toLowerCase();
+	const { content, channelId } = message;
+
+	// ignore #strategizing channel
+	if (channelId === '1317908504849285251') return;
 
 	let operatorNameFound;
 	for (const operatorName of operatorNames) {
-		if (content.includes(operatorName)) {
+		if (content.toLowerCase().includes(operatorName)) {
 			operatorNameFound = operatorName;
 			break;
 		}
 	}
 
 	if (!operatorNameFound) {
+		return;
+	}
+
+	if (Math.random() >= pileDriverChance) {
+		console.log('Math.random() >= pileDriverChance');
 		return;
 	}
 
@@ -130,8 +167,7 @@ client.on('messageCreate', async message => {
 	}
 
 	const operatorData = operators[operatorNameFound];
-	if (!operatorData)
-		throw Error('????');
+	if (!operatorData) throw Error('????');
 
 	const artUrl = operatorData.art[0].link;
 	const pileDriverUrl = randomElement(pileDriverGifs);
