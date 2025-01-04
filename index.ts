@@ -4,7 +4,7 @@ import { stdout } from 'node:process';
 
 import sharp from 'sharp';
 import GIFEncoder from 'gifencoder';
-import Discord from 'discord.js';
+import * as Discord from 'discord.js';
 
 let pileDriverChance = 0.5;
 
@@ -175,7 +175,7 @@ client.on('messageCreate', async message => {
 	const artBuffer = await urlToBuffer(artUrl);
 	const pileDriverBuffer = await urlToBuffer(pileDriverUrl);
 	const combinedGifBuffer = await generateSideBySideImage(artBuffer, pileDriverBuffer);
-	fs.writeFileSync(filename, combinedGifBuffer);
+	fs.writeFileSync(filename, combinedGifBuffer as any);
 	message.reply({ files: [{ contentType: 'image/gif', name: filename, attachment: combinedGifBuffer }] });
 });
 
