@@ -23,7 +23,9 @@ const commands: Discord.ApplicationCommandDataResolvable[] = [
 				type: Discord.ApplicationCommandOptionType.Number,
 				name: 'chance',
 				description: 'chance',
-				required: true
+				required: true,
+				minValue: 0,
+				maxValue: 1
 			}
 		]
 	},
@@ -100,9 +102,9 @@ if (!fs.existsSync('gif_links.json')) {
 const gifLinks: NodeJS.Dict<string> = JSON.parse(fs.readFileSync('gif_links.json').toString());
 
 client.on('messageCreate', async message => {
-	const { content, channelId } = message;
+	const { content, channelId, author } = message;
 
-	if (!enabledChannelIds.includes(channelId)) return;
+	if (!enabledChannelIds.includes(channelId) || author.bot) return;
 
 	let operatorNameFound;
 	for (const operatorName of operatorNames) {
@@ -112,14 +114,13 @@ client.on('messageCreate', async message => {
 		}
 	}
 
-	if (!operatorNameFound) {
-		return;
-	}
+	if (!operatorNameFound) return;
 
-	if (Math.random() >= pileDriverChance) {
-		console.log('Math.random() >= pileDriverChance');
-		return;
-	}
+	// W is a single letter and sent too often, so cut it's chance in half
+	// prettier-ignore
+	const chance = (operatorNameFound === 'w') ? (Math.random() * 2) : Math.random();
+
+	if (chance >= pileDriverChance) return;
 
 	if (operatorNameFound in gifLinks) {
 		console.log(`${operatorNameFound} found in gifLinks, sending link`);
@@ -138,7 +139,7 @@ client.on('messageCreate', async message => {
 	console.log(`${operatorNameFound}: no gif found, generating one...`);
 
 	const operatorData = operators[operatorNameFound];
-	if (!operatorData) throw Error('????');
+	if (!operatorData) throw Error('operators[operatorNameFound] is undefined????');
 
 	const artUrl = operatorData.art[0].link;
 	const pileDriverUrl = randomElement(pileDriverGifs);
@@ -157,7 +158,7 @@ client.on('messageCreate', async message => {
 		message.reply('something has gone horribly wrong: cannot get attachment url');
 		return;
 	}
-	gifLinks[operatorNameFound] = reply.attachments.first()?.url;
+	gifLinks[operatorNameFound] = attachment.url;
 });
 
 const exitHandler = (err?: Error) => {
