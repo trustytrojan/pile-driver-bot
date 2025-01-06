@@ -43,7 +43,7 @@ client.on('ready', client => {
 		.then(() => console.log('Set guild commands'));
 });
 
-let pileDriverChance = 0.5;
+let pileDriverChance = 0.15;
 let enabledChannelIds = [
 	'1317908398943244310',
 	'1317908475002486914',
