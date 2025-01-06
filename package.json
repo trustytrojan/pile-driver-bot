@@ -20,7 +20,7 @@
 		"proseWrap": "preserve"
 	},
 	"scripts": {
-		"start": "bash -c 'deno index.ts &>log & echo $! >pid'",
+		"start": "bash -c 'deno -A index.ts &>log & echo $! >pid'",
 		"stop": "bash -c 'kill $(<pid)'",
 		"fmt": "prettier --log-level=warn --write './**/*.ts'",
 		"build": "tsc"
