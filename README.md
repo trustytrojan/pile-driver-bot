@@ -1,4 +1,9 @@
 # pile-driver-bot
-pretty bad implementation right now, gifs are generated on-the-fly, saved to disk, and uploaded to discord.
+self-explanatory if you are brainrotted enough
 
-**todo/next task:** generate gifs beforehand and just use links to those gifs instead
+## usage
+assuming you have deno installed:
+```sh
+deno install
+deno task start
+```
