@@ -1,6 +1,7 @@
 deno.lock
 node_modules
 *.gif
-*token*
 operators.json
 dist
+.vscode
+.env

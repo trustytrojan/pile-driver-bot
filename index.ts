@@ -91,11 +91,15 @@ if (!fs.existsSync('operators.json')) {
 	}
 	fs.writeFileSync('operators.json', JSON.stringify(operators, null, '\t'));
 } else {
-	// operators = await import('./operators.json', { with: { type: 'json' } });
 	operators = JSON.parse(fs.readFileSync('operators.json').toString());
 }
 
 const operatorNames = Object.keys(operators);
+
+const { error } = (await import('dotenv')).config();
+if (error)
+	throw error;
+// DISCORD_TOKEN env var is checked during construction, not login() method
 
 const client = new Discord.Client({
 	intents: ['Guilds', 'GuildMessages', 'MessageContent']
@@ -175,8 +179,8 @@ client.on('messageCreate', async message => {
 	const artBuffer = await urlToBuffer(artUrl);
 	const pileDriverBuffer = await urlToBuffer(pileDriverUrl);
 	const combinedGifBuffer = await generateSideBySideImage(artBuffer, pileDriverBuffer);
-	fs.writeFileSync(filename, combinedGifBuffer as any);
+	fs.writeFileSync(filename, combinedGifBuffer);
 	message.reply({ files: [{ contentType: 'image/gif', name: filename, attachment: combinedGifBuffer }] });
 });
 
-client.login(fs.readFileSync('token').toString());
+client.login();
