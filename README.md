@@ -7,3 +7,6 @@ assuming you have deno installed:
 deno install
 deno task start
 ```
+
+## todo list
+- start generating several pile driver gifs per character, store in json as object of objects

@@ -130,12 +130,6 @@ client.on('messageCreate', async message => {
 
 	const filename = `${operatorNameFound}.gif`;
 
-	if (fs.existsSync(filename)) {
-		console.log(`${operatorNameFound} found in ${filename}, sending file`);
-		message.reply({ files: [filename] });
-		return;
-	}
-
 	console.log(`${operatorNameFound}: no gif found, generating one...`);
 
 	const operatorData = operators[operatorNameFound];
@@ -147,7 +141,6 @@ client.on('messageCreate', async message => {
 	const artBuffer = await urlToBuffer(artUrl);
 	const pileDriverBuffer = await urlToBuffer(pileDriverUrl);
 	const combinedGifBuffer = await generateSideBySideImage(artBuffer, pileDriverBuffer);
-	fs.writeFileSync(filename, combinedGifBuffer);
 
 	// save attachment url for later uses
 	const reply = await message.reply({
@@ -169,6 +162,7 @@ const exitHandler = (err?: Error) => {
 		});
 	fs.writeFileSync('gif_links.json', JSON.stringify(gifLinks, null, '\t'));
 	client.destroy();
+	process.exit(err ? 1 : 0);
 };
 
 process.on('uncaughtException', exitHandler);

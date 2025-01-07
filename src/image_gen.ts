@@ -3,6 +3,7 @@ import sharp from 'sharp';
 import GIFEncoder from 'gifencoder';
 import { stdout } from 'node:process';
 
+// TODO: store several gifs per character. first step: turn this into an object
 export const pileDriverGifs = [
 	'https://media1.tenor.com/m/Q7KV-nZ8W-AAAAAd/piledriver-sex.gif',
 	'https://media1.tenor.com/m/xpoRJWS15pEAAAAd/diesel-hammer-crane.gif',
@@ -24,11 +25,15 @@ export async function generateSideBySideImage(image: string | Buffer, gif: strin
 		throw Error('metadata missing');
 	}
 
+	// console.log(`image size: ${imgMetadata.width}x${imgMetadata.height}`);
+
 	const aspectRatio = imgMetadata.width / imgMetadata.height;
-	const newImgWidth = gifMetadata.height * aspectRatio;
+	const newImgWidth = Math.round(gifMetadata.height * aspectRatio);
+	// console.log(`aspectRatio=${aspectRatio} newImgWidth=${newImgWidth}`);
 
 	const width = newImgWidth + gifMetadata.width;
 	const height = gifMetadata.height;
+	// console.log(`new gif dimensions: ${width}x${height}`);
 
 	const encoder = new GIFEncoder(width, height);
 	encoder.start();
